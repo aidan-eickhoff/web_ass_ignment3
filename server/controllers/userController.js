@@ -4,7 +4,7 @@ const mysql = require('mysql');
 let connection = mysql.createConnection({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
-  password: process.env.DB_PASS,
+  password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME
 });
 
@@ -118,8 +118,10 @@ exports.delete = (req, res) => {
 
   connection.query('UPDATE user SET status = ? WHERE id = ?', ['removed', req.params.id], (err, rows) => {
     if (!err) {
-      let removedUser = encodeURIComponent('User successeflly removed.');
-      res.redirect('/?removed=' + removedUser);
+      connection.query('SELECT first_name FROM user WHERE id = ?', [req.params.id], (error, result) => {
+        //let removedUser = encodeURIComponent('User successfully removed.');
+        res.redirect('/?removed=' + JSON.parse(JSON.stringify(result))[0].first_name);
+      });
     } else {
       console.log(err);
     }
