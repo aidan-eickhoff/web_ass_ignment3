@@ -54,7 +54,7 @@
             <% if (user.status !== 'Active' && user.status !== 'active') { %>
                 <a href="activateuser/<%- user.id %>" type="button" class="btn btn-light btn-small"><i class="bi bi-play"> Activate</i></a>
             <% } else { %>
-                <a href="deactivateuser/<%- user.id %>" type="button" class="btn btn-light btn-small"><i class="bi bi-play"> Deactivate</i></a>
+                <a href="deactivateuser/<%- user.id %>" type="button" class="btn btn-light btn-small"><i class="bi bi-pause"> Deactivate</i></a>
             <% } %>
         </td>
         <td class="text-end">
