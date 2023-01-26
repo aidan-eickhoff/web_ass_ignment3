@@ -78,7 +78,7 @@ class User {
             if (!err) {
                 this.#connection.query('SELECT * FROM user WHERE id = ?', [id], (err, rows) => {
                     if (!err) {
-                        result = { rows, first_name };
+                        result = rows;
                         //res.render('edit-user', { rows, alert: `${first_name} has been updated.` });
                     } else {
                         console.log(err);
@@ -115,7 +115,7 @@ class User {
         return result;
     }
 
-    async viewActiveUsers(id) {
+    async viewUser(id) {
         let result;
         this.#connection.query('SELECT * FROM user WHERE id = ?', [id], (err, rows) => {
             if (!err) {
@@ -128,7 +128,6 @@ class User {
         while(result === undefined) {
             await new Promise(resolve => setTimeout(resolve, 10));
         }
-        //console.log('done timeout');
         return result;
     }
 }

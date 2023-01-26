@@ -1,6 +1,4 @@
-const mysql = require('mysql');
 const User = require('../../models/user');
-const e = require("express");
 
 // Connection Pool
 const userModel = new User(
@@ -18,10 +16,9 @@ exports.view = async (req, res) => {
 }
 
 // Find User by Search
-exports.find = (req, res) => {
+exports.find = async (req, res) => {
   let searchTerm = req.body.search;
-  const users = userModel.searchUsers(searchTerm);
-  console.log(users);
+  const users = await userModel.searchUsers(searchTerm);
   res.render('home', { users });
 }
 
@@ -30,39 +27,38 @@ exports.form = (req, res) => {
 }
 
 // Add new user
-exports.create = (req, res) => {
+exports.create = async (req, res) => {
   const { first_name, last_name, email, phone, comments } = req.body;
-  userModel.createUser(first_name, last_name, email, phone, comments);
+  await userModel.createUser(first_name, last_name, email, phone, comments);
   res.render('add-user', { alert: 'User added successfully.' });
 }
 
 
 // Edit user
-exports.edit = (req, res) => {
-  const users = userModel.editUser(req.params.id);
-  console.log(users);
+exports.edit = async (req, res) => {
+  const users = await userModel.editUser(req.params.id);
   res.render('edit-user', { users });
 }
 
 
 // Update User
-exports.update = (req, res) => {
+exports.update = async (req, res) => {
   const { first_name, last_name, email, phone, comments } = req.body;
-  const {users, name} = userModel.updateUser(first_name, last_name, email, phone, comments, req.params.id);
+  const users = await userModel.updateUser(first_name, last_name, email, phone, comments, req.params.id);
 
-  res.render('edit-user', { users, alert: `${name} has been updated.` });
+  res.render('edit-user', { users, alert: `${first_name} has been updated.` });
 
 }
 
 // Delete User
-exports.delete = (req, res) => {
-  const message = userModel.deleteUser(req.params.id);
+exports.delete = async (req, res) => {
+  const message = await userModel.deleteUser(req.params.id);
   res.redirect('/?removed=' + message);
 }
 
 // View Users
-exports.viewall = (req, res) => {
-  const user = userModel.viewActiveUsers(req.params.id);
-  res.render('view-user', { user });
+exports.viewUser = async (req, res) => {
+  const data = await userModel.viewUser(req.params.id);
+  res.render('view-user', { data });
 
 }
