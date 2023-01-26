@@ -30,7 +30,7 @@ exports.form = (req, res) => {
 exports.create = async (req, res) => {
   const { first_name, last_name, email, phone, comments } = req.body;
   await userModel.createUser(first_name, last_name, email, phone, comments);
-  res.render('add-user', { alert: 'User added successfully.' });
+  res.render('add-user', { message: 'User added successfully.' });
 }
 
 
@@ -46,7 +46,7 @@ exports.update = async (req, res) => {
   const { first_name, last_name, email, phone, comments } = req.body;
   const users = await userModel.updateUser(first_name, last_name, email, phone, comments, req.params.id);
 
-  res.render('edit-user', { users, alert: `${first_name} has been updated.` });
+  res.render('edit-user', { users, message: `${first_name} has been updated.` });
 
 }
 

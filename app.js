@@ -1,5 +1,8 @@
 const express = require('express');
-const exphbs = require('express-handlebars');
+const path = require("path");
+let ejs = require('ejs');
+let expressLayouts = require('express-ejs-layouts');
+//const exphbs = require('express-handlebars');
 //const bodyParser = require('body-parser'); // No longer Required
 //const mysql = require('mysql'); // Not required -> moved to userController
 
@@ -20,10 +23,15 @@ app.use(express.json()); // New
 // Static Files
 app.use(express.static('public'));
 
-// Templating Engine
-const handlebars = exphbs.create({ extname: '.hbs', });
-app.engine('.hbs', handlebars.engine);
-app.set('view engine', '.hbs');
+// Templating Engine Handlebars
+// const handlebars = exphbs.create({ extname: '.hbs', });
+// app.engine('.hbs', handlebars.engine);
+// app.set('view engine', '.hbs');
+
+// EJS
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, '/newViews/'));
+app.use(expressLayouts);
 
 // You don't need the connection here as we have it in userController
 // let connection = mysql.createConnection({
