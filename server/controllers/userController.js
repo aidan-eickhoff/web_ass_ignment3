@@ -1,40 +1,28 @@
 const mysql = require('mysql');
+const User = require('../../models/user');
+const e = require("express");
 
 // Connection Pool
-let connection = mysql.createConnection({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME
-});
+const userModel = new User(
+    process.env.DB_HOST,
+    process.env.DB_USER,
+    process.env.DB_PASSWORD,
+    process.env.DB_NAME
+);
 
 // View Users
-exports.view = (req, res) => {
-  // User the connection
-  connection.query('SELECT * FROM user WHERE status = "active"', (err, rows) => {
-    // When done with the connection, release it
-    if (!err) {
-      let removedUser = req.query.removed;
-      res.render('home', { rows, removedUser });
-    } else {
-      console.log(err);
-    }
-    console.log('The data from user table: \n', rows);
-  });
+exports.view = async (req, res) => {
+  const users = await userModel.selectActiveUsers();
+  let removedUser = req.query.removed;
+  res.render('home', { users, removedUser });
 }
 
 // Find User by Search
 exports.find = (req, res) => {
   let searchTerm = req.body.search;
-  // User the connection
-  connection.query('SELECT * FROM user WHERE first_name LIKE ? OR last_name LIKE ?', ['%' + searchTerm + '%', '%' + searchTerm + '%'], (err, rows) => {
-    if (!err) {
-      res.render('home', { rows });
-    } else {
-      console.log(err);
-    }
-    console.log('The data from user table: \n', rows);
-  });
+  const users = userModel.searchUsers(searchTerm);
+  console.log(users);
+  res.render('home', { users });
 }
 
 exports.form = (req, res) => {
@@ -44,103 +32,37 @@ exports.form = (req, res) => {
 // Add new user
 exports.create = (req, res) => {
   const { first_name, last_name, email, phone, comments } = req.body;
-  let searchTerm = req.body.search;
-
-  // User the connection
-  connection.query('INSERT INTO user SET first_name = ?, last_name = ?, email = ?, phone = ?, comments = ?', [first_name, last_name, email, phone, comments], (err, rows) => {
-    if (!err) {
-      res.render('add-user', { alert: 'User added successfully.' });
-    } else {
-      console.log(err);
-    }
-    console.log('The data from user table: \n', rows);
-  });
+  userModel.createUser(first_name, last_name, email, phone, comments);
+  res.render('add-user', { alert: 'User added successfully.' });
 }
 
 
 // Edit user
 exports.edit = (req, res) => {
-  // User the connection
-  connection.query('SELECT * FROM user WHERE id = ?', [req.params.id], (err, rows) => {
-    if (!err) {
-      res.render('edit-user', { rows });
-    } else {
-      console.log(err);
-    }
-    console.log('The data from user table: \n', rows);
-  });
+  const users = userModel.editUser(req.params.id);
+  console.log(users);
+  res.render('edit-user', { users });
 }
 
 
 // Update User
 exports.update = (req, res) => {
   const { first_name, last_name, email, phone, comments } = req.body;
-  // User the connection
-  connection.query('UPDATE user SET first_name = ?, last_name = ?, email = ?, phone = ?, comments = ? WHERE id = ?', [first_name, last_name, email, phone, comments, req.params.id], (err, rows) => {
+  const {users, name} = userModel.updateUser(first_name, last_name, email, phone, comments, req.params.id);
 
-    if (!err) {
-      // User the connection
-      connection.query('SELECT * FROM user WHERE id = ?', [req.params.id], (err, rows) => {
-        // When done with the connection, release it
-        
-        if (!err) {
-          res.render('edit-user', { rows, alert: `${first_name} has been updated.` });
-        } else {
-          console.log(err);
-        }
-        console.log('The data from user table: \n', rows);
-      });
-    } else {
-      console.log(err);
-    }
-    console.log('The data from user table: \n', rows);
-  });
+  res.render('edit-user', { users, alert: `${name} has been updated.` });
+
 }
 
 // Delete User
 exports.delete = (req, res) => {
-
-  // Delete a record
-
-  // User the connection
-  // connection.query('DELETE FROM user WHERE id = ?', [req.params.id], (err, rows) => {
-
-  //   if(!err) {
-  //     res.redirect('/');
-  //   } else {
-  //     console.log(err);
-  //   }
-  //   console.log('The data from user table: \n', rows);
-
-  // });
-
-  // Hide a record
-
-  connection.query('UPDATE user SET status = ? WHERE id = ?', ['removed', req.params.id], (err, rows) => {
-    if (!err) {
-      connection.query('SELECT first_name FROM user WHERE id = ?', [req.params.id], (error, result) => {
-        //let removedUser = encodeURIComponent('User successfully removed.');
-        res.redirect('/?removed=' + JSON.parse(JSON.stringify(result))[0].first_name);
-      });
-    } else {
-      console.log(err);
-    }
-    console.log('The data from beer table are: \n', rows);
-  });
-
+  const message = userModel.deleteUser(req.params.id);
+  res.redirect('/?removed=' + message);
 }
 
 // View Users
 exports.viewall = (req, res) => {
-
-  // User the connection
-  connection.query('SELECT * FROM user WHERE id = ?', [req.params.id], (err, rows) => {
-    if (!err) {
-      res.render('view-user', { rows });
-    } else {
-      console.log(err);
-    }
-    console.log('The data from user table: \n', rows);
-  });
+  const user = userModel.viewActiveUsers(req.params.id);
+  res.render('view-user', { user });
 
 }
