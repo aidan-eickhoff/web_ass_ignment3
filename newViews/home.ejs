@@ -27,6 +27,7 @@
         <th scope="col">Last Name</th>
         <th scope="col">Email</th>
         <th scope="col">Phone</th>
+        <th scope="col">Status</th>
         <th scope="col" class="text-end">Action</th>
     </tr>
     </thead>
@@ -34,7 +35,11 @@
 
 <!--    {{#each users}}-->
     <% users.forEach(function (user) { %>
-    <tr>
+        <% if (user.status.toLowerCase() !== 'active') { %>
+        <tr>
+        <% } else { %>
+        <tr class="bg-success">
+        <% } %>
 <!--        <th scope="row">{{this.id}}</th>-->
         <th scope="row"><%- user.id %></th>
 <!--        <td>{{this.first_name}}</td>-->
@@ -45,6 +50,13 @@
         <td><%- user.email %></td>
 <!--        <td>{{this.phone}}</td>-->
         <td><%- user.phone %></td>
+        <td>
+            <% if (user.status !== 'Active' && user.status !== 'active') { %>
+                <a href="activateuser/<%- user.id %>" type="button" class="btn btn-light btn-small"><i class="bi bi-play"> Activate</i></a>
+            <% } else { %>
+                <a href="deactivateuser/<%- user.id %>" type="button" class="btn btn-light btn-small"><i class="bi bi-play"> Deactivate</i></a>
+            <% } %>
+        </td>
         <td class="text-end">
 <!--            <a href="/viewuser/{{this.id}}" type="button" class="btn btn-light btn-small"><i class="bi bi-eye"></i> View</a>-->
             <a href="/viewuser/<%-user.id%>" type="button" class="btn btn-light btn-small"><i class="bi bi-eye"></i> View</a>

@@ -130,6 +130,40 @@ class User {
         }
         return result;
     }
+
+    activateUser(id) {
+        this.#connection.query('UPDATE user SET status = ? WHERE id = ?', ['Active', id], (err, result) => {
+            if (err) {
+                console.log(err);
+            }
+        });
+    }
+
+    deActivateUser(id) {
+        this.#connection.query('UPDATE user SET status = ? WHERE id = ?', ['None', id], (err, result) => {
+            if (err) {
+                console.log(err);
+            }
+        });
+    }
+
+    async selectUsers() {
+        let result;
+        await this.#connection.query('SELECT * FROM user WHERE status = "None" OR status = "active"', (err, rows) => {
+            if (!err) {
+                // console.log(rows);
+                result = rows;
+            } else {
+                console.log(err);
+            }
+        });
+
+        while(result === undefined) {
+            await new Promise(resolve => setTimeout(resolve, 10));
+        }
+        //console.log('done timeout');
+        return result;
+    }
 }
 
 module.exports = User;

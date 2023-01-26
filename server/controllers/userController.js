@@ -10,7 +10,8 @@ const userModel = new User(
 
 // View Users
 exports.view = async (req, res) => {
-  const users = await userModel.selectActiveUsers();
+  // const users = await userModel.selectActiveUsers();
+  const users = await userModel.selectUsers();
   let removedUser = req.query.removed;
   res.render('home', { users, removedUser });
 }
@@ -27,9 +28,9 @@ exports.form = (req, res) => {
 }
 
 // Add new user
-exports.create = async (req, res) => {
+exports.create = (req, res) => {
   const { first_name, last_name, email, phone, comments } = req.body;
-  await userModel.createUser(first_name, last_name, email, phone, comments);
+  userModel.createUser(first_name, last_name, email, phone, comments);
   res.render('add-user', { message: 'User added successfully.' });
 }
 
@@ -60,5 +61,14 @@ exports.delete = async (req, res) => {
 exports.viewUser = async (req, res) => {
   const data = await userModel.viewUser(req.params.id);
   res.render('view-user', { data });
+}
 
+exports.activate = (req, res) => {
+  userModel.activateUser(req.params.id);
+  res.redirect('/');
+}
+
+exports.deActivate = (req, res) => {
+  userModel.deActivateUser(req.params.id);
+  res.redirect('/');
 }
